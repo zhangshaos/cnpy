@@ -1,3 +1,10 @@
+# Note:
+
+Merge orign repos's pull requests:  
+pr40, pr55, pr65, pr77, pr83, pr87
+
+> In commit logs, "Merge pr97" should be "Mrege pr87".
+
 # Purpose:
 
 NumPy offers the `save` method for easy saving of arrays into .npy and `savez` for zipping multiple .npy arrays together into a .npz file. 
@@ -52,4 +59,4 @@ struct NpyArray {
 };
 ```
 
-See [example1.cpp](example1.cpp) for examples of how to use the library. example1 will also be build during cmake installation.
+See [example1.cpp](example.cpp) for examples of how to use the library. example1 will also be build during cmake installation.

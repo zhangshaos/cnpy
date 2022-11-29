@@ -5,19 +5,21 @@
 #ifndef LIBCNPY_H_
 #define LIBCNPY_H_
 
-#include<string>
-#include<stdexcept>
-#include<sstream>
-#include<vector>
-#include<cstdio>
-#include<typeinfo>
-#include<iostream>
-#include<cassert>
-#include<zlib.h>
-#include<map>
-#include<memory>
-#include<stdint.h>
-#include<numeric>
+#include <string>
+#include <stdexcept>
+#include <sstream>
+#include <vector>
+#include <cstdio>
+#include <typeinfo>
+#include <iostream>
+#include <cassert>
+#include <map>
+#include <memory>
+#include <cstdint>
+#include <numeric>
+
+#include <zlib.h>
+#include <opencv2/core.hpp>
 
 namespace cnpy {
 
@@ -47,6 +49,45 @@ namespace cnpy {
         std::vector<T> as_vec() const {
             const T* p = data<T>();
             return std::vector<T>(p, p+num_vals);
+        }
+
+        /**
+         * Construct a cv::Mat from *this.
+         *
+         * @note NpyArray.shape.size() must to be in [1,3].
+         *
+         * @tparam ElemType float, double, int...
+         * @return
+         */
+        template<typename ElemType>
+        cv::Mat to_cv_mat()
+        {
+          using T = std::decay_t<ElemType>;
+          T* ptr = data<T>();
+          CV_Assert(shape.size()<=3 && shape.size()>=1);
+          std::vector<int> sz;
+          for (size_t d : shape)
+            sz.emplace_back((int)d);
+
+          int flag;
+          if constexpr (std::is_same_v<T, float>)
+            flag = CV_32F;
+          else if constexpr (std::is_same_v<T, double>)
+            flag = CV_64F;
+          else if constexpr (std::is_same_v<T, int>)
+            flag = CV_32S;
+          else if constexpr (std::is_same_v<T, short>)
+            flag = CV_16S;
+          else if constexpr (std::is_same_v<T, unsigned short>)
+            flag = CV_16U;
+          else if constexpr (std::is_same_v<T, signed char> || std::is_same_v<T, char>)
+            flag = CV_8S;
+          else if constexpr (std::is_same_v<T, unsigned char>)
+            flag = CV_8U;
+          else
+            static_assert(std::is_same_v<T, void> && !std::is_same_v<T, void>,
+                          "Unsupported element type.");
+          return cv::Mat(sz.size(), &sz.front(), flag, ptr).clone();
         }
 
         size_t num_bytes() const {
@@ -265,7 +306,6 @@ namespace cnpy {
 
         return header;
     }
-
 
 }
 
