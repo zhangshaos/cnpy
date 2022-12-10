@@ -20,5 +20,8 @@ target_link_libraries(cnpy PUBLIC ZLIB::ZLIB ${OpenCV_LIBS})
 ###################################
 #       Build c++ Example         #
 ###################################
+set(BUILD_EXAMPLE FALSE)
+if(BUILD_EXAMPLE)
 add_executable(cnpy_example example.cpp)
 target_link_libraries(cnpy_example cnpy)
+endif()
